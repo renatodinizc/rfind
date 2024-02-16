@@ -4,9 +4,9 @@ use walkdir::WalkDir;
 
 #[derive(Debug)]
 pub struct Input {
+    pub names: Option<RegexSet>,
     pub paths: Vec<String>,
     pub types: Vec<EntryType>,
-    pub names: Option<RegexSet>,
 }
 
 #[derive(Debug)]
@@ -42,6 +42,7 @@ pub fn get_args() -> Input {
         .get_matches();
 
     Input {
+        names: matches.get_many::<String>("names").map(|inputs| RegexSet::new(inputs).expect("invalid regex pattern")),
         paths: matches
             .get_many::<String>("paths")
             .unwrap()
@@ -60,10 +61,6 @@ pub fn get_args() -> Input {
                     }
                 })
                 .collect::<Vec<EntryType>>(),
-        },
-        names: match matches.get_many::<String>("names") {
-            None => None,
-            Some(inputs) => Some(RegexSet::new(inputs).expect("invalid regex pattern")),
         },
     }
 }

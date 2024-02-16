@@ -91,17 +91,12 @@ pub fn execute(path: &String, input: &Input) {
                             println!("{}", entry.path().display());
                         }
                     }
-                } else {
-                    if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
-                        println!("{}", entry.path().display());
-                    } else if entry.file_type().is_file() && input.types.contains(&EntryType::File)
-                    {
-                        println!("{}", entry.path().display());
-                    } else if entry.file_type().is_symlink()
-                        && input.types.contains(&EntryType::Link)
-                    {
-                        println!("{}", entry.path().display());
-                    }
+                } else if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
+                    println!("{}", entry.path().display());
+                } else if entry.file_type().is_file() && input.types.contains(&EntryType::File) {
+                    println!("{}", entry.path().display());
+                } else if entry.file_type().is_symlink() && input.types.contains(&EntryType::Link) {
+                    println!("{}", entry.path().display());
                 }
             }
         }

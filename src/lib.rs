@@ -9,7 +9,7 @@ pub struct Input {
     pub types: Vec<EntryType>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum EntryType {
     File,
     Dir,
@@ -42,14 +42,16 @@ pub fn get_args() -> Input {
         .get_matches();
 
     Input {
-        names: matches.get_many::<String>("names").map(|inputs| RegexSet::new(inputs).expect("invalid regex pattern")),
+        names: matches
+            .get_many::<String>("names")
+            .map(|inputs| RegexSet::new(inputs).expect("invalid regex pattern")),
         paths: matches
             .get_many::<String>("paths")
             .unwrap()
             .map(|v| v.to_string())
             .collect::<Vec<String>>(),
         types: match matches.get_many::<String>("types") {
-            None => vec![],
+            None => vec![EntryType::File, EntryType::Dir, EntryType::Link],
             Some(values) => values
                 .map(|value| {
                     if value == "f" {
@@ -77,10 +79,29 @@ pub fn execute(path: &String, input: &Input) {
                         .unwrap()
                         .is_match(entry.file_name().to_str().unwrap())
                     {
-                        println!("{}", entry.path().display());
+                        if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
+                            println!("{}", entry.path().display());
+                        } else if entry.file_type().is_file()
+                            && input.types.contains(&EntryType::File)
+                        {
+                            println!("{}", entry.path().display());
+                        } else if entry.file_type().is_symlink()
+                            && input.types.contains(&EntryType::Link)
+                        {
+                            println!("{}", entry.path().display());
+                        }
                     }
                 } else {
-                    println!("{}", entry.path().display());
+                    if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
+                        println!("{}", entry.path().display());
+                    } else if entry.file_type().is_file() && input.types.contains(&EntryType::File)
+                    {
+                        println!("{}", entry.path().display());
+                    } else if entry.file_type().is_symlink()
+                        && input.types.contains(&EntryType::Link)
+                    {
+                        println!("{}", entry.path().display());
+                    }
                 }
             }
         }

@@ -1,10 +1,12 @@
 use clap::{builder::PossibleValuesParser, command, Arg, ArgAction};
+use regex::RegexSet;
+use walkdir::WalkDir;
 
 #[derive(Debug)]
 pub struct Input {
     pub paths: Vec<String>,
     pub types: Vec<EntryType>,
-    pub names: Vec<String>,
+    pub names: Option<RegexSet>,
 }
 
 #[derive(Debug)]
@@ -60,8 +62,30 @@ pub fn get_args() -> Input {
                 .collect::<Vec<EntryType>>(),
         },
         names: match matches.get_many::<String>("names") {
-            None => vec![],
-            Some(values) => values.map(|v| v.to_string()).collect::<Vec<String>>(),
+            None => None,
+            Some(inputs) => Some(RegexSet::new(inputs).expect("invalid regex pattern")),
         },
+    }
+}
+
+pub fn execute(path: &String, input: &Input) {
+    for file in WalkDir::new(path) {
+        match file {
+            Err(e) => eprintln!("rfind: {}", e),
+            Ok(entry) => {
+                if input.names.is_some() {
+                    if input
+                        .names
+                        .as_ref()
+                        .unwrap()
+                        .is_match(entry.file_name().to_str().unwrap())
+                    {
+                        println!("{}", entry.path().display());
+                    }
+                } else {
+                    println!("{}", entry.path().display());
+                }
+            }
+        }
     }
 }

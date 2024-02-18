@@ -57,7 +57,7 @@ While `glob_to_regex` significantly enhances `rfind`'s usability, it has limitat
 1. Clone the repository:
 
 ```bash
-git clone https://yourrepositoryurl.com/rfind.git
+git clone git@github.com:renatodinizc/rfind.git
 cd rfind
 ```
 
@@ -67,7 +67,7 @@ cd rfind
 cargo build --release
 ```
 
-3. The executable will be available in ./target/release.
+3. The executable will be available in `./target/release`
 
 ### Usage
 

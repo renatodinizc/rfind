@@ -3,13 +3,13 @@ use regex::RegexSet;
 use walkdir::WalkDir;
 
 pub struct Input {
-    pub names: Option<RegexSet>,
     pub paths: Vec<String>,
-    pub types: Vec<EntryType>,
+    names: Option<RegexSet>,
+    types: Vec<EntryType>,
 }
 
 #[derive(PartialEq)]
-pub enum EntryType {
+enum EntryType {
     File,
     Dir,
     Link,

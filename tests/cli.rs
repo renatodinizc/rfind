@@ -103,3 +103,31 @@ fn test_find_files_with_complex_regex_pattern_should_fail() {
     assert!(!stdout.contains("tests/dir2/subdir/file3.txt"));
     assert!(!stdout.contains("tests/cli.rs"));
 }
+
+#[test]
+fn test_max_depth_limit() {
+    let args = ["tests", "--max-depth", "1"];
+
+    let output = run_rfind_with_args(&args);
+    let stdout = from_utf8(&output.stdout).expect("Output not valid UTF-8");
+
+    assert!(output.status.success());
+    assert!(stdout.contains("tests/dir1"));
+    assert!(stdout.contains("tests/dir2"));
+    assert!(!stdout.contains("tests/dir1/file1.txt"));
+    assert!(!stdout.contains("tests/dir2/file2.txt"));
+}
+
+#[test]
+fn test_min_depth_limit() {
+    let args = ["tests", "--min-depth", "3"];
+
+    let output = run_rfind_with_args(&args);
+    let stdout = from_utf8(&output.stdout).expect("Output not valid UTF-8");
+
+    assert!(output.status.success());
+    assert!(stdout.contains("tests/dir2/subdir/symlink1.txt"));
+    assert!(stdout.contains("tests/dir2/subdir/file3.txt"));
+    assert!(!stdout.contains("tests/dir1"));
+    assert!(!stdout.contains("tests/cli.rs"));
+}

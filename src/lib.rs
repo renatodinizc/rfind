@@ -6,6 +6,8 @@ pub struct Input {
     pub paths: Vec<String>,
     names: Option<RegexSet>,
     types: Vec<EntryType>,
+    max_depth: Option<usize>,
+    min_depth: Option<usize>,
 }
 
 #[derive(PartialEq)]
@@ -32,6 +34,18 @@ pub fn get_args() -> Input {
                 .long("name")
                 .action(ArgAction::Append),
         )
+        .arg(
+            Arg::new("max_depth")
+                .help("Descend at most levels (a non-negative integer) of directories below the starting-points")
+                .long("max-depth")
+                .value_parser(clap::value_parser!(usize)),
+            )
+        .arg(
+            Arg::new("min_depth")
+                .help("Do not apply any tests or actions at levels less than levels (a non-negative integer)")
+                .long("min-depth")
+                .value_parser(clap::value_parser!(usize)),
+            )
         .arg(
             Arg::new("paths")
                 .help("search paths")
@@ -66,18 +80,19 @@ pub fn get_args() -> Input {
                 })
                 .collect::<Vec<EntryType>>(),
         },
+        max_depth: matches.get_one::<usize>("max_depth").copied(),
+        min_depth: matches.get_one::<usize>("min_depth").copied(),
     }
 }
 
 pub fn execute(path: &String, input: &Input) {
     let name_closure = |entry: &walkdir::DirEntry| {
-        input.names.is_none() || {
-            input
+        input.names.is_none()
+            || input
                 .names
                 .as_ref()
                 .unwrap()
                 .is_match(entry.file_name().to_str().unwrap())
-        }
     };
 
     let type_closure = |entry: &walkdir::DirEntry| {
@@ -85,6 +100,14 @@ pub fn execute(path: &String, input: &Input) {
             || entry.file_type().is_dir() && input.types.contains(&EntryType::Dir)
             || entry.file_type().is_file() && input.types.contains(&EntryType::File)
             || entry.file_type().is_symlink() && input.types.contains(&EntryType::Link)
+    };
+
+    let max_depth_closure = |entry: &walkdir::DirEntry| {
+        input.max_depth.is_none() || entry.depth() <= input.max_depth.unwrap()
+    };
+
+    let min_depth_closure = |entry: &walkdir::DirEntry| {
+        input.min_depth.is_none() || entry.depth() >= input.min_depth.unwrap()
     };
 
     WalkDir::new(path)
@@ -98,6 +121,8 @@ pub fn execute(path: &String, input: &Input) {
         })
         .filter(name_closure)
         .filter(type_closure)
+        .filter(max_depth_closure)
+        .filter(min_depth_closure)
         .for_each(|item| println!("{}", item.path().display()));
 }
 

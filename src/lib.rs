@@ -51,7 +51,7 @@ pub fn get_args() -> Input {
             .map(|v| v.to_string())
             .collect::<Vec<String>>(),
         types: match matches.get_many::<String>("types") {
-            None => vec![EntryType::File, EntryType::Dir, EntryType::Link],
+            None => vec![],
             Some(values) => values
                 .map(|value| {
                     if value == "f" {
@@ -68,37 +68,37 @@ pub fn get_args() -> Input {
 }
 
 pub fn execute(path: &String, input: &Input) {
-    for file in WalkDir::new(path) {
-        match file {
-            Err(e) => eprintln!("rfind: {}", e),
-            Ok(entry) => {
-                if input.names.is_some() {
-                    if input
-                        .names
-                        .as_ref()
-                        .unwrap()
-                        .is_match(entry.file_name().to_str().unwrap())
-                    {
-                        if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
-                            println!("{}", entry.path().display());
-                        } else if entry.file_type().is_file()
-                            && input.types.contains(&EntryType::File)
-                        {
-                            println!("{}", entry.path().display());
-                        } else if entry.file_type().is_symlink()
-                            && input.types.contains(&EntryType::Link)
-                        {
-                            println!("{}", entry.path().display());
-                        }
-                    }
-                } else if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
-                    println!("{}", entry.path().display());
-                } else if entry.file_type().is_file() && input.types.contains(&EntryType::File) {
-                    println!("{}", entry.path().display());
-                } else if entry.file_type().is_symlink() && input.types.contains(&EntryType::Link) {
-                    println!("{}", entry.path().display());
-                }
-            }
+    let name_closure = |entry: &walkdir::DirEntry| {
+        input.names.is_none() || {
+            input
+                .names
+                .as_ref()
+                .unwrap()
+                .is_match(entry.file_name().to_str().unwrap())
         }
-    }
+    };
+
+    let type_closure = |entry: &walkdir::DirEntry| {
+        input.types.is_empty()
+            || if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
+                true
+            } else if entry.file_type().is_file() && input.types.contains(&EntryType::File) {
+                true
+            } else {
+                entry.file_type().is_symlink() && input.types.contains(&EntryType::Link)
+            }
+    };
+
+    WalkDir::new(path)
+        .into_iter()
+        .filter_map(|e| match e {
+            Err(e) => {
+                eprintln!("rfind: {}", e);
+                None
+            }
+            Ok(entry) => Some(entry),
+        })
+        .filter(name_closure)
+        .filter(type_closure)
+        .for_each(|item| println!("{}", item.path().display()));
 }

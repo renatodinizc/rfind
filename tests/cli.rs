@@ -129,9 +129,7 @@ fn test_find_symlinks_only() {
 #[test]
 fn test_find_csv_files_only() {
     let args = ["tests", "-n", "\\.csv$"];
-    let expected_csv_files = [
-        "tests/dir2/file.csv",
-    ];
+    let expected_csv_files = ["tests/dir2/file.csv"];
     let unexpected_file = "tests/dir1/file1.txt";
 
     let output = run_rfind_with_args(&args);

@@ -16,7 +16,7 @@
 - `-n`, `--name <PATTERN>`: Filter files by regex pattern applied to their names.
 - `--max-depth <DEPTH>`: Limit the search to a maximum depth relative to each starting point.
 - `--min-depth <DEPTH>`: Exclude directories and files above a certain depth from the starting points.
-- `-s`, `--size <+|-SIZE>`: Filter files by size. Prefix size with `+` to find files larger than the specified size in KiB, or `-` for smaller.
+- `-s`, `--size <+|-SIZE>`: Filter files by size. The default option find files larger than the specified size in KiB. Prefix input with `-` to search for smaller sized files.
 
 ## Understanding Pattern Matching in `rfind`
 

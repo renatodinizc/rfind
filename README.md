@@ -1,29 +1,22 @@
 # rfind
 
-`rfind` is a Rust-based command-line tool designed to mimic the functionality of the GNU `find` command. It allows users to search for files in a directory hierarchy based on various criteria such as name patterns, file types, and more.
+`rfind` is a Rust-based command-line tool designed to mimic the functionality of the GNU `find` command. It allows users to search for files in a directory hierarchy based on a range of criteria such as name patterns, file types, size, and directory depth.
 
 ## Features
 
-- Search by file name using regular expressions.
-- Filter results by file type (file, directory, symlink).
-- Customizable search paths.
+- **Flexible File Searching**: Search files by name using powerful regular expressions.
+- **File Type Filtering**: Narrow your search to files, directories, or symbolic links using the `-t` or `--type` flag.
+- **Depth Control**: Specify the minimum (`--min-depth`) and maximum (`--max-depth`) depth of directory traversal to refine your search.
+- **Size Criteria**: Find files by size with the `--size` flag, using kibibytes (KiB) as the unit and allowing for greater or lesser size comparisons.
+- **Customizable Search Paths**: Define where `rfind` begins its search, with support for multiple paths.
 
 ## Available Flags
 
-`rfind` supports several flags to help you refine your search criteria. Here's a list of available flags and how to use them:
-
-- `-t` or `--type`: Specify the type of files to find. Possible values are `f` for files, `d` for directories, and `l` for symlinks. You can specify multiple types by repeating the flag.
-
-```bash
-  # Find all directories and symlinks.
-  ./target/release/rfind . -t d -t l
-```
-- `-n` or `--name`: Filter search results by a regex pattern applied to file names. The pattern must follow Rust's regex syntax.
-
-```bash
-  # Find all files with names ending in .txt.
-  ./target/release/rfind . -n "\\.txt$"
-```
+- `-t`, `--type [f|d|l]`: Filter search results by file type. Possible values: `f` for files, `d` for directories, and `l` for symlinks.
+- `-n`, `--name <PATTERN>`: Filter files by regex pattern applied to their names.
+- `--max-depth <DEPTH>`: Limit the search to a maximum depth relative to each starting point.
+- `--min-depth <DEPTH>`: Exclude directories and files above a certain depth from the starting points.
+- `--size <+|-SIZE>`: Filter files by size. Prefix size with `+` to find files larger than the specified size in KiB, or `-` for smaller.
 
 ## Understanding Pattern Matching in `rfind`
 

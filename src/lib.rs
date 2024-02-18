@@ -8,6 +8,7 @@ pub struct Input {
     types: Vec<EntryType>,
     max_depth: Option<usize>,
     min_depth: Option<usize>,
+    size: Option<i32>,
 }
 
 #[derive(PartialEq)]
@@ -47,6 +48,13 @@ pub fn get_args() -> Input {
                 .value_parser(clap::value_parser!(usize)),
             )
         .arg(
+            Arg::new("size")
+                .help("Find files by size in kibibytes (KiB, units of 1024 bytes), more or less depending on the sign of input")
+                .long("size")
+                .allow_hyphen_values(true)
+                .value_parser(clap::value_parser!(i32)),
+            )
+        .arg(
             Arg::new("paths")
                 .help("search paths")
                 .action(ArgAction::Append)
@@ -82,6 +90,7 @@ pub fn get_args() -> Input {
         },
         max_depth: matches.get_one::<usize>("max_depth").copied(),
         min_depth: matches.get_one::<usize>("min_depth").copied(),
+        size: matches.get_one::<i32>("size").copied(),
     }
 }
 
@@ -110,6 +119,14 @@ pub fn execute(path: &String, input: &Input) {
         input.min_depth.is_none() || entry.depth() >= input.min_depth.unwrap()
     };
 
+    let size_closure = |entry: &walkdir::DirEntry| {
+        input.size.is_none()
+            || (input.size.unwrap().is_positive()
+                && entry.metadata().unwrap().len() as i32 > input.size.unwrap() * 1024)
+            || (input.size.unwrap().is_negative()
+                && (entry.metadata().unwrap().len() as i32) < input.size.unwrap() * -1024)
+    };
+
     WalkDir::new(path)
         .into_iter()
         .filter_map(|e| match e {
@@ -123,6 +140,7 @@ pub fn execute(path: &String, input: &Input) {
         .filter(type_closure)
         .filter(max_depth_closure)
         .filter(min_depth_closure)
+        .filter(size_closure)
         .for_each(|item| println!("{}", item.path().display()));
 }
 

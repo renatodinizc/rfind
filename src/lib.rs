@@ -80,13 +80,9 @@ pub fn execute(path: &String, input: &Input) {
 
     let type_closure = |entry: &walkdir::DirEntry| {
         input.types.is_empty()
-            || if entry.file_type().is_dir() && input.types.contains(&EntryType::Dir) {
-                true
-            } else if entry.file_type().is_file() && input.types.contains(&EntryType::File) {
-                true
-            } else {
-                entry.file_type().is_symlink() && input.types.contains(&EntryType::Link)
-            }
+            || entry.file_type().is_dir() && input.types.contains(&EntryType::Dir)
+            || entry.file_type().is_file() && input.types.contains(&EntryType::File)
+            || entry.file_type().is_symlink() && input.types.contains(&EntryType::Link)
     };
 
     WalkDir::new(path)

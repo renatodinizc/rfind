@@ -2,14 +2,13 @@ use clap::{builder::PossibleValuesParser, command, Arg, ArgAction};
 use regex::RegexSet;
 use walkdir::WalkDir;
 
-#[derive(Debug)]
 pub struct Input {
     pub names: Option<RegexSet>,
     pub paths: Vec<String>,
     pub types: Vec<EntryType>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 pub enum EntryType {
     File,
     Dir,

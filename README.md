@@ -1,13 +1,13 @@
-# rfind
+# `rfind`
 
 `rfind` is a Rust-based command-line tool designed to mimic the functionality of the GNU `find` command. It allows users to search for files in a directory hierarchy based on a range of criteria such as name patterns, file types, size, and directory depth.
 
 ## Features
 
-- **Flexible File Searching**: Search files by name using powerful regular expressions.
+- **Flexible File Searching**: Search files by name using regular expressions.
 - **File Type Filtering**: Narrow your search to files, directories, or symbolic links using the `-t` or `--type` flag.
 - **Depth Control**: Specify the minimum (`--min-depth`) and maximum (`--max-depth`) depth of directory traversal to refine your search.
-- **Size Criteria**: Find files by size with the `--size` flag, using kibibytes (KiB) as the unit and allowing for greater or lesser size comparisons.
+- **Size Criteria**: Find files by size with the `-s` or `--size` flag, using kibibytes (KiB) as the unit and allowing for greater or lesser size comparisons.
 - **Customizable Search Paths**: Define where `rfind` begins its search, with support for multiple paths.
 
 ## Available Flags
@@ -16,7 +16,7 @@
 - `-n`, `--name <PATTERN>`: Filter files by regex pattern applied to their names.
 - `--max-depth <DEPTH>`: Limit the search to a maximum depth relative to each starting point.
 - `--min-depth <DEPTH>`: Exclude directories and files above a certain depth from the starting points.
-- `--size <+|-SIZE>`: Filter files by size. Prefix size with `+` to find files larger than the specified size in KiB, or `-` for smaller.
+- `-s`, `--size <+|-SIZE>`: Filter files by size. Prefix size with `+` to find files larger than the specified size in KiB, or `-` for smaller.
 
 ## Understanding Pattern Matching in `rfind`
 

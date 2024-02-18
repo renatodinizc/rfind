@@ -50,6 +50,7 @@ pub fn get_args() -> Input {
         .arg(
             Arg::new("size")
                 .help("Find files by size in kibibytes (KiB, units of 1024 bytes), more or less depending on the sign of input")
+                .short('s')
                 .long("size")
                 .allow_hyphen_values(true)
                 .value_parser(clap::value_parser!(i32)),

@@ -41,9 +41,12 @@ pub fn get_args() -> Input {
         .get_matches();
 
     Input {
-        names: matches
-            .get_many::<String>("names")
-            .map(|inputs| RegexSet::new(inputs).expect("invalid regex pattern")),
+        names: matches.get_many::<String>("names").map(|inputs| {
+            let regex_patterns = inputs
+                .map(|pattern| glob_to_regex(pattern))
+                .collect::<Vec<String>>();
+            RegexSet::new(regex_patterns).expect("invalid regex pattern")
+        }),
         paths: matches
             .get_many::<String>("paths")
             .unwrap()
@@ -96,4 +99,21 @@ pub fn execute(path: &String, input: &Input) {
         .filter(name_closure)
         .filter(type_closure)
         .for_each(|item| println!("{}", item.path().display()));
+}
+
+fn glob_to_regex(pattern: &str) -> String {
+    let mut regex = String::from("^");
+    for char in pattern.chars() {
+        match char {
+            '*' => regex.push_str(".*"),
+            '?' => regex.push('.'),
+            '.' | '(' | ')' | '{' | '}' | '[' | ']' | '+' | '|' | '^' | '$' | '\\' => {
+                regex.push('\\');
+                regex.push(char);
+            }
+            _ => regex.push(char),
+        }
+    }
+    regex.push('$');
+    regex
 }

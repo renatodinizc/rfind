@@ -25,6 +25,33 @@
   ./target/release/rfind . -n "\\.txt$"
 ```
 
+## Understanding Pattern Matching in `rfind`
+
+`rfind` incorporates a feature for filtering search results based on file name patterns. This functionality leverages Rust's regex engine to match file names against specified patterns. To bridge the gap between common shell glob patterns and Rust's regex syntax, I've included a specialized translator.
+
+#### How It Works
+
+- **Asterisks (`*`)** are translated into `.*`, matching any sequence of characters.
+- **Question marks (`?`)** become `.`, matching any single character.
+- **Special characters** like `.` `(` `)` `{` `}` `[` `]` `+` `|` `^` `$` `\\` are escaped, ensuring they match literally in file names.
+
+#### Example Usage
+
+To find all `.txt` files, you might use a glob pattern like `*.txt`. `rfind` automatically converts this into the regex pattern `^.*\.txt` for matching.
+
+```bash
+# Using glob pattern for finding .txt files
+./target/release/rfind . -n "*.txt"
+```
+
+#### Limitations
+
+While `glob_to_regex` significantly enhances `rfind`'s usability, it has limitations:
+
+1. **Simple Patterns**: It's designed for basic shell glob patterns and may not fully support advanced globbing features such as negated character classes or brace expansion.
+2. **Special Characters**: Literal instances of special regex characters in glob patterns need manual escaping.
+3. **Performance**: Regex patterns, especially those with many wildcards, can be less efficient than simple string matches.
+
 ## Getting Started
 
 ### Prerequisites
@@ -77,6 +104,3 @@ Contributions are welcome! Please feel free to submit pull requests, report bugs
 
 ### License
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-
-
